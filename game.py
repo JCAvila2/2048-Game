@@ -2,6 +2,7 @@ import random
 import keyboard
 import os
 import time
+import math
 
 
 grid = [
@@ -43,30 +44,58 @@ def generate_random_grid(grid):
 def move_up(grid):
     print("Moving up")
     new_grid = grid
+    for columns in range(4):
+        rows = 0
+        column_ready = False
+        while column_ready == False:
+            if new_grid[rows][columns] == None and new_grid[rows + 1][columns] != None and rows + 1 <= 3:
+                new_grid[rows][columns] = new_grid[rows + 1][columns]
+                new_grid[rows + 1][columns] = None
+            rows += 1
+            if rows == 3:
+                column_ready = True
+                for j in range(3):
+                    if new_grid[j][columns] == None and new_grid[j + 1][columns] != None:
+                        column_ready = False
+                        rows = 0
+                        break
+                    elif new_grid[j][columns] != None and new_grid[j][columns] == new_grid[j - 1][columns]:
+                        if new_grid[j + 1][columns] != None:
+                            new_grid[j][columns] = new_grid[j + 1][columns]
+                            new_grid[j + 1][columns] = None
+                        else:
+                            new_grid[j][columns] = None
+                        new_grid[j - 1][columns] *= 2
+                        new_grid[j - 1][columns] += 0.1
+    for r in range(4):
+        for c in range(4):
+            if new_grid[r][c] != None:
+                new_grid[r][c] = math.floor(new_grid[r][c])
+
     return new_grid
 
 
 def move_down(grid):
     print("Moving Down")
     new_grid = grid
-    for columnas in range(4):
-        filas = 3
-        columna_completa = False
-        while columna_completa == False:
-            if new_grid[filas][columnas] == None and new_grid[filas-1][columnas] != None and filas-1 >= 0:
-                new_grid[filas][columnas] = new_grid[filas-1][columnas]
-                new_grid[filas-1][columnas] = None
-            filas -= 1
-            if filas == -1:
-                columna_completa = True
+    for columns in range(4):
+        rows = 3
+        column_ready = False
+        while column_ready == False:
+            if new_grid[rows][columns] == None and new_grid[rows-1][columns] != None and rows-1 >= 0:
+                new_grid[rows][columns] = new_grid[rows-1][columns]
+                new_grid[rows-1][columns] = None
+            rows -= 1
+            if rows == -1:
+                column_ready = True
                 for i in range(3):
-                    if new_grid[i][columnas] != None and new_grid[i + 1][columnas] == None:
-                        columna_completa = False
-                        filas = 3
+                    if new_grid[i][columns] != None and new_grid[i + 1][columns] == None:
+                        column_ready = False
+                        rows = 3
                         break
-                    elif new_grid[i][columnas] != None and new_grid[i][columnas] == new_grid[i + 1][columnas]:
-                        new_grid[i][columnas] = None
-                        new_grid[i + 1][columnas] *= 2
+                    elif new_grid[i][columns] != None and new_grid[i][columns] == new_grid[i + 1][columns]:
+                        new_grid[i][columns] = None
+                        new_grid[i + 1][columns] *= 2
                         break
     return new_grid
 
