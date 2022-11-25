@@ -1,8 +1,8 @@
 import random
 import keyboard
 import os
-import time
 import math
+import copy
 
 
 grid = [
@@ -42,8 +42,7 @@ def generate_random_grid(grid, amount):
 
 # methods to move the grid
 def move_up(grid):
-    print("Moving up")
-    new_grid = grid
+    new_grid = copy.deepcopy(grid)
     for columns in range(4):
         rows = 0
         column_ready = False
@@ -72,12 +71,13 @@ def move_up(grid):
             if new_grid[i][j] != None:
                 new_grid[i][j] = math.floor(new_grid[i][j])
 
+    if new_grid == grid:
+        return False
     return new_grid
 
 
 def move_down(grid):
-    print("Moving Down")
-    new_grid = grid
+    new_grid = copy.deepcopy(grid)
     for columns in range(4):
         rows = 3
         column_ready = False
@@ -106,12 +106,13 @@ def move_down(grid):
             if new_grid[i][j] != None:
                 new_grid[i][j] = math.floor(new_grid[i][j])
 
+    if new_grid == grid:
+        return False
     return new_grid
 
 
 def move_left(grid):
-    print("Moving left")
-    new_grid = grid
+    new_grid = copy.deepcopy(grid)
     for rows in range(4):
         columns = 0
         row_ready = False
@@ -142,12 +143,13 @@ def move_left(grid):
             if new_grid[i][j] != None:
                 new_grid[i][j] = math.floor(new_grid[i][j])
 
+    if new_grid == grid:
+        return False
     return new_grid
 
 
 def move_right(grid):
-    print("Moving right")
-    new_grid = grid
+    new_grid = copy.deepcopy(grid)
     for rows in range(4):
         columns = 3
         row_ready = False
@@ -178,6 +180,8 @@ def move_right(grid):
             if new_grid[i][j] != None:
                 new_grid[i][j] = math.floor(new_grid[i][j])
 
+    if new_grid == grid:
+        return False
     return new_grid
 
 
@@ -185,22 +189,39 @@ def move_right(grid):
 grid = generate_random_grid(grid, 2)
 
 
-while keyboard.is_pressed("q") == False:
+while True:
     #os.system("cls")
     print_grid(grid)
-    user_input = input("Move (a, w, s, d):")
-    if user_input == "q":
-        print("Bye...")
+    if move_up(grid) or move_down(grid) or move_left(grid) or move_right(grid):
+        user_input = input("Move (a, w, s, d):")
+        if user_input == "q":
+            print("Bye...")
+            break    
+        elif user_input == "w":
+            new_grid = move_up(grid)
+            if new_grid:
+                grid = new_grid    
+                grid = generate_random_grid(grid, 1)
+        
+        elif user_input == "s":
+            new_grid = move_down(grid)
+            if new_grid:
+                grid = new_grid    
+                grid = generate_random_grid(grid, 1)
+        
+        elif user_input == "a":
+            new_grid = move_left(grid)
+            if new_grid:
+                grid = new_grid    
+                grid = generate_random_grid(grid, 1)
+        
+        elif user_input == "d":
+            new_grid = move_right(grid)
+            if new_grid:
+                grid = new_grid    
+                grid = generate_random_grid(grid, 1)
+        
+        print("=" * 100)
+    else:
+        print("Game Over D:")
         break
-    elif user_input == "w":
-        grid = move_up(grid)
-    elif user_input == "s":
-        grid = move_down(grid)
-    elif user_input == "a":
-        grid = move_left(grid) 
-    elif user_input == "d":
-        grid = move_right(grid) 
-    
-    grid = generate_random_grid(grid, 1)
-    print("=" * 100)
-    #time.sleep(1.5)
