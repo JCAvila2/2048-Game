@@ -24,9 +24,9 @@ def print_grid(grid):
         print(actual_horizontal_line)
 
   
-def generate_random_grid(grid):
+def generate_random_grid(grid, amount):
     counter = 0
-    while counter < 2:
+    while counter < amount:
         counter += 1
         options = [2, 4]
         value = options[random.randint(0, 1)]
@@ -47,6 +47,7 @@ def move_up(grid):
     for columns in range(4):
         rows = 0
         column_ready = False
+        number_added_already = 0.01
         while column_ready == False:
             if new_grid[rows][columns] == None and new_grid[rows + 1][columns] != None and rows + 1 <= 3:
                 new_grid[rows][columns] = new_grid[rows + 1][columns]
@@ -54,23 +55,22 @@ def move_up(grid):
             rows += 1
             if rows == 3:
                 column_ready = True
-                for j in range(3):
-                    if new_grid[j][columns] == None and new_grid[j + 1][columns] != None:
+                for r in range(3):
+                    if new_grid[r][columns] == None and new_grid[r + 1][columns] != None:
                         column_ready = False
                         rows = 0
-                        break
-                    elif new_grid[j][columns] != None and new_grid[j][columns] == new_grid[j - 1][columns]:
-                        if new_grid[j + 1][columns] != None:
-                            new_grid[j][columns] = new_grid[j + 1][columns]
-                            new_grid[j + 1][columns] = None
-                        else:
-                            new_grid[j][columns] = None
-                        new_grid[j - 1][columns] *= 2
-                        new_grid[j - 1][columns] += 0.1
-    for r in range(4):
-        for c in range(4):
-            if new_grid[r][c] != None:
-                new_grid[r][c] = math.floor(new_grid[r][c])
+                        break 
+                    if new_grid[r][columns] != None and new_grid[r][columns] == new_grid[r + 1][columns]:
+                        new_grid[r][columns] *= 2
+                        new_grid[r][columns] += number_added_already
+                        number_added_already += 0.01
+                        new_grid[r + 1][columns] = None
+                        column_ready = False
+                        rows = 0
+    for i in range(4):
+        for j in range(4):
+            if new_grid[i][j] != None:
+                new_grid[i][j] = math.floor(new_grid[i][j])
 
     return new_grid
 
@@ -81,56 +81,126 @@ def move_down(grid):
     for columns in range(4):
         rows = 3
         column_ready = False
+        number_added_already = 0.01
         while column_ready == False:
-            if new_grid[rows][columns] == None and new_grid[rows-1][columns] != None and rows-1 >= 0:
-                new_grid[rows][columns] = new_grid[rows-1][columns]
-                new_grid[rows-1][columns] = None
+            if new_grid[rows][columns] == None and new_grid[rows - 1][columns] != None and rows - 1 >= 0:
+                new_grid[rows][columns] = new_grid[rows - 1][columns]
+                new_grid[rows - 1][columns] = None
             rows -= 1
             if rows == -1:
                 column_ready = True
-                for i in range(3):
-                    if new_grid[i][columns] != None and new_grid[i + 1][columns] == None:
+                for k in range(3, 0, -1):
+                    if new_grid[k][columns] == None and new_grid[k - 1][columns] != None:
                         column_ready = False
                         rows = 3
                         break
-                    elif new_grid[i][columns] != None and new_grid[i][columns] == new_grid[i + 1][columns]:
-                        new_grid[i][columns] = None
-                        new_grid[i + 1][columns] *= 2
-                        break
+                    if new_grid[k][columns] != None and new_grid[k][columns] == new_grid[k - 1][columns]:
+                        new_grid[k][columns] *= 2
+                        new_grid[k][columns] += number_added_already
+                        number_added_already += 0.01
+                        new_grid[k - 1][columns] = None
+                        column_ready = False
+                        rows = 3          
+    for i in range(4):
+        for j in range(4):
+            if new_grid[i][j] != None:
+                new_grid[i][j] = math.floor(new_grid[i][j])
+
     return new_grid
 
 
 def move_left(grid):
     print("Moving left")
-    return grid
+    new_grid = grid
+    for rows in range(4):
+        columns = 0
+        row_ready = False
+        number_added_already = 0.01
+        while row_ready == False:
+            if new_grid[rows][columns] == None and new_grid[rows][columns + 1] != None and columns + 1 <= 3:
+                new_grid[rows][columns] = new_grid[rows][columns + 1]
+                new_grid[rows][columns + 1] = None
+            columns += 1
+            if columns == 3:
+                row_ready = True
+                for c in range(3):
+                    if new_grid[rows][c] == None and new_grid[rows][c + 1] != None:
+                        row_ready = False
+                        columns = 0
+                        break
+                    if new_grid[rows][c] != None and new_grid[rows][c] == new_grid[rows][c + 1]:
+                        new_grid[rows][c] *= 2
+                        new_grid[rows][c] += number_added_already
+                        number_added_already += 0.01
+                        new_grid[rows][c + 1] = None
+
+                        row_ready = False
+                        columns = 0
+
+    for i in range(4):
+        for j in range(4):
+            if new_grid[i][j] != None:
+                new_grid[i][j] = math.floor(new_grid[i][j])
+
+    return new_grid
 
 
 def move_right(grid):
     print("Moving right")
-    return grid
+    new_grid = grid
+    for rows in range(4):
+        columns = 3
+        row_ready = False
+        number_added_already = 0.01
+        while row_ready == False:
+            if (new_grid[rows][columns] == None) and (new_grid[rows][columns - 1] != None) and columns - 1 >= 0:
+                new_grid[rows][columns] = new_grid[rows][columns - 1]
+                new_grid[rows][columns - 1] = None
+            columns -= 1
+            if columns == 0:
+                row_ready = True
+                for c in range(3, 0, -1):
+                    if new_grid[rows][c] == None and new_grid[rows][c - 1] != None:
+                        row_ready = False
+                        columns = 3
+                        break
+                    if new_grid[rows][c] != None and new_grid[rows][c] == new_grid[rows][c - 1]:
+                        new_grid[rows][c] *= 2
+                        new_grid[rows][c] += number_added_already
+                        number_added_already += 0.01
+                        new_grid[rows][c - 1] = None
+
+                        row_ready = False
+                        columns = 3      
+
+    for i in range(4):
+        for j in range(4):
+            if new_grid[i][j] != None:
+                new_grid[i][j] = math.floor(new_grid[i][j])
+
+    return new_grid
 
 
 
-grid = generate_random_grid(grid)
+grid = generate_random_grid(grid, 2)
 
 
 while keyboard.is_pressed("q") == False:
-    os.system("cls")
+    #os.system("cls")
     print_grid(grid)
-
     user_input = input("Move (a, w, s, d):")
     if user_input == "q":
         print("Bye...")
         break
     elif user_input == "w":
         grid = move_up(grid)
-
     elif user_input == "s":
         grid = move_down(grid)
-    
     elif user_input == "a":
-        move_left(grid) 
+        grid = move_left(grid) 
     elif user_input == "d":
-        move_right(grid) 
+        grid = move_right(grid) 
     
-    time.sleep(1)
+    grid = generate_random_grid(grid, 1)
+    print("=" * 100)
+    #time.sleep(1.5)
