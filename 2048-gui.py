@@ -2,7 +2,6 @@ import pygame
 import math
 import random
 import copy
-import keyboard
 import time
 
 
@@ -24,6 +23,19 @@ GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 
+COLOR_EMPTY = (204, 192, 179)
+COLOR_2 = (238, 228, 218)
+COLOR_4 = (237, 224, 200)
+COLOR_8 = (242, 177, 121)
+COLOR_16 = (245, 149, 99)
+COLOR_32 = (246, 124, 95)
+COLOR_64 = (246, 94, 59)
+COLOR_128 = (237, 207, 114)
+COLOR_256 = (237, 204, 97)
+COLOR_512 = (237, 200, 80)
+COLOR_1024 = (237, 197, 63)
+COLOR_2048 = (237, 194, 46)
+   
 
 
 # Initial Grid
@@ -211,17 +223,42 @@ def draw_board(grid):
     window.fill(WHITE)
     x = 45
     y = 45
-    pygame.draw.rect(window, ORANGE, pygame.Rect(30, 30, 500, 500),  2)
+    pygame.draw.rect(window, (187, 173, 160), pygame.Rect(30, 30, 500, 500))
     
     for r in range(4):
         for c in range(4):
-            pygame.draw.rect(window, GREEN, pygame.Rect(x, y, 100, 100), 2)
-
             # Draw the number on each box
             if grid[r][c] != None:
+                # Choose the background color based on the number in the space
+                if grid[r][c] == 2:
+                    pygame.draw.rect(window, COLOR_2, pygame.Rect(x, y, 100, 100))
+                elif grid[r][c] == 4:
+                    pygame.draw.rect(window, COLOR_4, pygame.Rect(x, y, 100, 100))
+                elif grid[r][c] == 8:
+                    pygame.draw.rect(window, COLOR_8, pygame.Rect(x, y, 100, 100))
+                elif grid[r][c] == 16:
+                    pygame.draw.rect(window, COLOR_16, pygame.Rect(x, y, 100, 100))
+                elif grid[r][c] == 32:
+                    pygame.draw.rect(window, COLOR_32, pygame.Rect(x, y, 100, 100))
+                elif grid[r][c] == 64:
+                    pygame.draw.rect(window, COLOR_64, pygame.Rect(x, y, 100, 100))
+                elif grid[r][c] == 128:
+                    pygame.draw.rect(window, COLOR_128, pygame.Rect(x, y, 100, 100))
+                elif grid[r][c] == 256:
+                    pygame.draw.rect(window, COLOR_256, pygame.Rect(x, y, 100, 100))
+                elif grid[r][c] == 512:
+                    pygame.draw.rect(window, COLOR_512, pygame.Rect(x, y, 100, 100))
+                elif grid[r][c] == 1024:
+                    pygame.draw.rect(window, COLOR_1024, pygame.Rect(x, y, 100, 100))
+                elif grid[r][c] == 2048:
+                    pygame.draw.rect(window, COLOR_2048, pygame.Rect(x, y, 100, 100))
+                else:
+                    pygame.draw.rect(window, (0, 0, 255), pygame.Rect(x, y, 100, 100))
                 text = font.render(str(grid[r][c]), True, BLACK)
             else:
+                pygame.draw.rect(window, COLOR_EMPTY, pygame.Rect(x, y, 100, 100))
                 text = font.render("", True, BLACK)
+
             textRect = text.get_rect()
             textRect.center = (x + 100 // 2, y + 100 // 2)
             window.blit(text, textRect)
@@ -239,7 +276,7 @@ while run:
 
     if move_up(grid) == False and move_down(grid) == False and move_left(grid) == False and move_right(grid) == False:
         print("Game Over D:")
-        time.sleep(2)
+        time.sleep(1)
         window.fill(RED)
         pygame.display.update()
         time.sleep(3)
