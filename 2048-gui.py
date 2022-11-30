@@ -15,14 +15,12 @@ pygame.display.set_caption("2048")
 font = pygame.font.Font('freesansbold.ttf', 32)
 
 
-
 # Colors variables
 WHITE = (255, 255, 255)
 ORANGE = (185, 75, 0)
 GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
-
 COLOR_EMPTY = (204, 192, 179)
 COLOR_2 = (238, 228, 218)
 COLOR_4 = (237, 224, 200)
@@ -37,7 +35,6 @@ COLOR_1024 = (237, 197, 63)
 COLOR_2048 = (237, 194, 46)
    
 
-
 # Initial Grid
 grid = [
         [None, None, None, None], 
@@ -46,6 +43,7 @@ grid = [
         [None, None, None, None]
     ]
 
+score = 0
 
 
 # Make changes to the grid
@@ -69,14 +67,13 @@ def floor_grid(grid):
         for c in range(4):
             if grid[r][c] != None:
                 grid[r][c] = math.floor(grid[r][c])
-
     return grid
 
 
-
 # Methods to move the grid
-def move_up(grid):
+def move_up(grid, score):
     new_grid = copy.deepcopy(grid)
+    updated_score = copy.deepcopy(score)
     for columns in range(4):
         rows = 0
         column_ready = False
@@ -95,26 +92,23 @@ def move_up(grid):
                         break 
                     if new_grid[r][columns] != None and new_grid[r][columns] == new_grid[r + 1][columns]:
                         new_grid[r][columns] *= 2
+                        updated_score += new_grid[r][columns]
                         new_grid[r][columns] += number_added_already
                         number_added_already += 0.01
                         new_grid[r + 1][columns] = None
                         column_ready = False
                         rows = 0
-    """
-    for i in range(4):
-        for j in range(4):
-            if new_grid[i][j] != None:
-                new_grid[i][j] = math.floor(new_grid[i][j])
-    """
+
     new_grid = floor_grid(new_grid)
                 
     if new_grid == grid:
-        return False
-    return new_grid
+        return False, score
+    return new_grid, updated_score
 
 
-def move_down(grid):
+def move_down(grid, score):
     new_grid = copy.deepcopy(grid)
+    updated_score = copy.deepcopy(score)
     for columns in range(4):
         rows = 3
         column_ready = False
@@ -133,22 +127,23 @@ def move_down(grid):
                         break
                     if new_grid[k][columns] != None and new_grid[k][columns] == new_grid[k - 1][columns]:
                         new_grid[k][columns] *= 2
+                        updated_score += new_grid[k][columns]
                         new_grid[k][columns] += number_added_already
                         number_added_already += 0.01
                         new_grid[k - 1][columns] = None
                         column_ready = False
                         rows = 3    
 
-    # floor loops
     new_grid = floor_grid(new_grid)
     
     if new_grid == grid:
-        return False
-    return new_grid
+        return False, score
+    return new_grid, updated_score
 
 
-def move_left(grid):
+def move_left(grid, score):
     new_grid = copy.deepcopy(grid)
+    updated_score = copy.deepcopy(score)
     for rows in range(4):
         columns = 0
         row_ready = False
@@ -167,6 +162,7 @@ def move_left(grid):
                         break
                     if new_grid[rows][c] != None and new_grid[rows][c] == new_grid[rows][c + 1]:
                         new_grid[rows][c] *= 2
+                        updated_score += new_grid[rows][c]
                         new_grid[rows][c] += number_added_already
                         number_added_already += 0.01
                         new_grid[rows][c + 1] = None
@@ -174,16 +170,16 @@ def move_left(grid):
                         row_ready = False
                         columns = 0
 
-    # floor loops
     new_grid = floor_grid(new_grid)
 
     if new_grid == grid:
-        return False
-    return new_grid
+        return False, score
+    return new_grid, updated_score
 
 
-def move_right(grid):
+def move_right(grid, score):
     new_grid = copy.deepcopy(grid)
+    updated_score = copy.deepcopy(score)
     for rows in range(4):
         columns = 3
         row_ready = False
@@ -202,6 +198,7 @@ def move_right(grid):
                         break
                     if new_grid[rows][c] != None and new_grid[rows][c] == new_grid[rows][c - 1]:
                         new_grid[rows][c] *= 2
+                        updated_score += new_grid[rows][c]
                         new_grid[rows][c] += number_added_already
                         number_added_already += 0.01
                         new_grid[rows][c - 1] = None
@@ -209,17 +206,15 @@ def move_right(grid):
                         row_ready = False
                         columns = 3      
 
-    # floor loops
     new_grid = floor_grid(new_grid)
 
     if new_grid == grid:
-        return False
-    return new_grid
-
+        return False, score
+    return new_grid, updated_score
 
 
 # Draw the board
-def draw_board(grid):
+def draw_board(grid, score):
     window.fill(WHITE)
     x = 45
     y = 45
@@ -227,9 +222,7 @@ def draw_board(grid):
     
     for r in range(4):
         for c in range(4):
-            # Draw the number on each box
             if grid[r][c] != None:
-                # Choose the background color based on the number in the space
                 if grid[r][c] == 2:
                     pygame.draw.rect(window, COLOR_2, pygame.Rect(x, y, 100, 100))
                 elif grid[r][c] == 4:
@@ -267,17 +260,26 @@ def draw_board(grid):
         y += 120
         x = 45
 
+        score_in_screen = font.render("Score: " + str(score), True, BLACK)
+        window.blit(score_in_screen, (550, 50))
 
-
+        
 grid = add_to_grid(grid, 2)
 run = True
 while run:
-    draw_board(grid)
+    draw_board(grid, score)
 
-    if move_up(grid) == False and move_down(grid) == False and move_left(grid) == False and move_right(grid) == False:
-        print("Game Over D:")
+    if move_up(grid, score)[0] == False and move_down(grid, score)[0] == False and move_left(grid, score)[0] == False and move_right(grid, score)[0] == False:
         time.sleep(1)
         window.fill(RED)
+        game_over_message = font.render("Game Over!", True, BLACK)
+        game_over_position = game_over_message.get_rect()
+        game_over_position.center = (WIDTH // 2, HEIGHT // 2)
+        window.blit(game_over_message, game_over_position)
+        final_score_message = font.render("Final Score: " + str(score), True, BLACK)
+        score_position = final_score_message.get_rect()
+        score_position.center = (WIDTH // 2, (HEIGHT // 2) + 50)
+        window.blit(final_score_message, score_position)
         pygame.display.update()
         time.sleep(3)
         run = False
@@ -289,30 +291,23 @@ while run:
             break
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
-                new_grid = move_up(grid)
+                new_grid, score = move_up(grid, score)
                 if new_grid:
-                    print("Moving UP")
                     grid = new_grid    
                     grid = add_to_grid(grid, 1)
-
             if event.key == pygame.K_DOWN:
-                new_grid = move_down(grid)
+                new_grid, score = move_down(grid, score)
                 if new_grid:
-                    print("Moving Down")
                     grid = new_grid    
                     grid = add_to_grid(grid, 1)
-                    
             if event.key == pygame.K_LEFT:
-                new_grid = move_left(grid)
+                new_grid, score = move_left(grid, score)
                 if new_grid:
-                    print("Moving Left")
                     grid = new_grid    
                     grid = add_to_grid(grid, 1)
-
             if event.key == pygame.K_RIGHT:
-                new_grid = move_right(grid)
+                new_grid, score = move_right(grid, score)
                 if new_grid:
-                    print("Moving Right")
                     grid = new_grid    
                     grid = add_to_grid(grid, 1)
 
